@@ -22,7 +22,6 @@ func (c *Channel) Remove(conn net.Conn) {
 	delete(c.connections, conn)
 }
 
-// userChannels holds a mapping from userID to their private Channel.
 var (
 	userChannels = struct {
 		sync.RWMutex
@@ -32,8 +31,11 @@ var (
 	}
 )
 
-// getUserChannel retrieves or creates a private channel for a given userID.
-func GetUserChannel(userID float64) *Channel {
+/*
+Retrieves or creates a private channel for a given userID.
+Used after upgrading connection
+*/
+func GetOrCreateUserChannel(userID float64) *Channel {
 	userChannels.RLock()
 	ch, exists := userChannels.channels[userID]
 	userChannels.RUnlock()
@@ -52,4 +54,37 @@ func GetUserChannel(userID float64) *Channel {
 	}
 
 	return ch
+}
+
+// Returns list of connections based on userID
+func GetUserConnections(userID float64) ([]net.Conn, bool) {
+	userChannels.RLock()
+	ch, exists := userChannels.channels[userID]
+	userChannels.RUnlock()
+
+	if !exists {
+		return nil, false
+	}
+
+	ch.mu.Lock()
+	connections := make([]net.Conn, 0, len(ch.connections))
+	for conn := range ch.connections {
+		connections = append(connections, conn)
+	}
+
+	return connections, true
+}
+
+// Previous function but for multiple users (cleaner for loop in main)
+func GetMultipleUserConnections(userIDs [2]float64) []net.Conn {
+	connCollection := make([]net.Conn, 0)
+
+	for i := range userIDs {
+		userConns, exists := GetUserConnections(userIDs[i])
+		if exists {
+			connCollection = append(connCollection, userConns...)
+		}
+	}
+
+	return connCollection
 }
