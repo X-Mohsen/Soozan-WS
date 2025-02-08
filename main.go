@@ -11,6 +11,7 @@ import (
 
 	"Soozan-ws/auth"
 	"Soozan-ws/channels"
+	"Soozan-ws/interservice"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -43,15 +44,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Adding user to his own private group
-	userChannel := channels.GetUserChannel(userID)
+	userChannel := channels.GetOrCreateUserChannel(userID)
 	userChannel.Add(conn)
-	log.Printf("User %s joined their private channel", userID)
+	log.Printf("User %f joined their private channel", userID)
 
 	// Ensure in DC user is removed from his group | closing connection
 	defer func() {
 		userChannel.Remove(conn)
 		conn.Close()
-		log.Printf("User %s disconnected", userID)
+		log.Printf("User %f disconnected", userID)
 	}()
 
 	for {
@@ -60,12 +61,31 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Read error:", err)
 			break
 		}
-		log.Printf("Received: %s\n", msg)
 
-		if err := wsutil.WriteServerMessage(conn, op, msg); err != nil {
-			log.Println("Write error:", err)
-			break
+		response, users, err := interservice.Responde(msg)
+
+		if err == nil {
+			if users[0] == 0 {
+				// if no user is set to the array send the response to current conn
+				err = wsutil.WriteServerMessage(conn, op, response)
+			} else {
+				conns := channels.GetMultipleUserConnections(users)
+				for _, conn := range conns {
+					err = wsutil.WriteServerMessage(conn, op, response)
+				}
+
+			}
+			if err != nil {
+				log.Println("Write error:", err)
+			}
+
+		} else {
+			errorAsByte := []byte(err.Error())
+			if err := wsutil.WriteServerMessage(conn, op, errorAsByte); err != nil {
+				log.Println("Write error:", err)
+			}
 		}
+
 	}
 }
 
