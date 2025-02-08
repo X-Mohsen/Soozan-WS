@@ -9,9 +9,8 @@ import (
 	"time"
 )
 
-// HttpRequest sends a request to another service and returns the response or error
+// HttpRequest sends a request to other service and returns response/error
 func HttpRequest(url string, method, token string, data interface{}) (*http.Response, error) {
-	// Marshal the data if it's not nil
 	var requestBody []byte
 	if data != nil {
 		var err error
@@ -21,7 +20,6 @@ func HttpRequest(url string, method, token string, data interface{}) (*http.Resp
 		}
 	}
 
-	// Create a new HTTP request
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -32,10 +30,9 @@ func HttpRequest(url string, method, token string, data interface{}) (*http.Resp
 	req.Header.Set("Authorization", authValue)
 
 	client := &http.Client{
-		Timeout: 5 * time.Second, // Set a timeout for the request
+		Timeout: 5 * time.Second, // TODO check timeout
 	}
 
-	// Send the request
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
@@ -44,7 +41,6 @@ func HttpRequest(url string, method, token string, data interface{}) (*http.Resp
 	return resp, nil
 }
 
-// Example usage (for sending data to another service)
 func LoadChats(token string, page float64) ([]byte, error) {
 	endpointURL := "http://localhost:8000/request/inter-service/load-chats"
 	method := "POST"
@@ -73,7 +69,7 @@ func LoadChats(token string, page float64) ([]byte, error) {
 }
 
 func LoadMessages(token string, requestID, page float64) ([]byte, error) {
-	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/load-messages/%v/", requestID)
+	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/load-messages/%v", requestID)
 	method := "POST"
 
 	data := map[string]interface{}{
@@ -85,12 +81,10 @@ func LoadMessages(token string, requestID, page float64) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	// Check for successful response
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("received non-OK status code: %d", resp.StatusCode)
 	}
 
-	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
@@ -109,12 +103,10 @@ func NewMessage(token string, requestID float64, data map[string]interface{}) ([
 	}
 	defer resp.Body.Close()
 
-	// Check for successful response
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("received non-OK status code: %d", resp.StatusCode)
 	}
 
-	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
@@ -124,7 +116,7 @@ func NewMessage(token string, requestID float64, data map[string]interface{}) ([
 }
 
 func DeleteMessage(token string, messageID float64) ([]byte, error) {
-	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/delete-message/%v/", messageID)
+	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/delete-message/%v", messageID)
 	method := "POST"
 
 	var data []byte
@@ -135,12 +127,10 @@ func DeleteMessage(token string, messageID float64) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	// Check for successful response
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("received non-OK status code: %d", resp.StatusCode)
 	}
 
-	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
