@@ -57,7 +57,7 @@ func GetOrCreateUserChannel(userID float64) *Channel {
 }
 
 // Returns list of connections based on userID
-func GetUserConnections(userID float64) ([]net.Conn, bool) {
+func getUserConnections(userID float64) ([]net.Conn, bool) {
 	userChannels.RLock()
 	ch, exists := userChannels.channels[userID]
 	userChannels.RUnlock()
@@ -80,7 +80,7 @@ func GetMultipleUserConnections(userIDs [2]float64) []net.Conn {
 	connCollection := make([]net.Conn, 0)
 
 	for i := range userIDs {
-		userConns, exists := GetUserConnections(userIDs[i])
+		userConns, exists := getUserConnections(userIDs[i])
 		if exists {
 			connCollection = append(connCollection, userConns...)
 		}
