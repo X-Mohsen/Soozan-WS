@@ -10,7 +10,7 @@ import (
 )
 
 // HttpRequest sends a request to other service and returns response/error
-func HttpRequest(url string, method, token string, data interface{}) (*http.Response, error) {
+func httpRequest(url string, method, token string, data interface{}) (*http.Response, error) {
 	var requestBody []byte
 	if data != nil {
 		var err error
@@ -48,7 +48,7 @@ func LoadChats(token string, page float64) ([]byte, error) {
 	data := map[string]interface{}{
 		"page": page,
 	}
-	resp, err := HttpRequest(endpointURL, method, token, data)
+	resp, err := httpRequest(endpointURL, method, token, data)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func LoadMessages(token string, requestID, page float64) ([]byte, error) {
 	data := map[string]interface{}{
 		"page": page,
 	}
-	resp, err := HttpRequest(endpointURL, method, token, data)
+	resp, err := httpRequest(endpointURL, method, token, data)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func NewMessage(token string, requestID float64, data map[string]interface{}) ([
 	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/new-message/%v", requestID)
 	method := "POST"
 
-	resp, err := HttpRequest(endpointURL, method, token, data)
+	resp, err := httpRequest(endpointURL, method, token, data)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func DeleteMessage(token string, messageID float64) ([]byte, error) {
 
 	var data []byte
 
-	resp, err := HttpRequest(endpointURL, method, token, data)
+	resp, err := httpRequest(endpointURL, method, token, data)
 	if err != nil {
 		return nil, err
 	}
