@@ -11,6 +11,7 @@ import (
 
 	"Soozan-ws/auth"
 	"Soozan-ws/channels"
+	"Soozan-ws/config"
 	"Soozan-ws/interservice"
 )
 
@@ -95,6 +96,7 @@ func main() {
 	}
 
 	http.HandleFunc("/ws", handler)
-	fmt.Println("WebSocket server started at ws://localhost:8080/ws")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("WebSocket server listening on port", config.ListenPort)
+	addr := fmt.Sprintf(":%s", config.ListenPort)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
