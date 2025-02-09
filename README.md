@@ -28,6 +28,8 @@ Follow these steps to set up and run the Soozan-WS:
 
 ## To-Do
 - [ ] Set auth between services
+- [ ] Pub/Sub
+- [ ] Read public key addr from env vars
 
 
 ### Pre-release To-Do
