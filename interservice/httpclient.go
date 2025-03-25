@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"Soozan-ws/config"
 )
 
 // HttpRequest sends a request to other service and returns response/error
@@ -42,7 +44,7 @@ func httpRequest(url string, method, token string, data interface{}) (*http.Resp
 }
 
 func LoadChats(token string, page float64) ([]byte, error) {
-	endpointURL := "http://localhost:8000/request/inter-service/load-chats"
+	endpointURL := fmt.Sprintf("%s/request/inter-service/load-chats", config.APIBASEURL)
 	method := "POST"
 
 	data := map[string]interface{}{
@@ -69,7 +71,7 @@ func LoadChats(token string, page float64) ([]byte, error) {
 }
 
 func LoadMessages(token string, requestID, page float64) ([]byte, error) {
-	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/load-messages/%v", requestID)
+	endpointURL := fmt.Sprintf("%s/request/inter-service/load-messages", config.APIBASEURL)
 	method := "POST"
 
 	data := map[string]interface{}{
@@ -94,7 +96,7 @@ func LoadMessages(token string, requestID, page float64) ([]byte, error) {
 }
 
 func NewMessage(token string, requestID float64, data map[string]interface{}) ([]byte, error) {
-	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/new-message/%v", requestID)
+	endpointURL := fmt.Sprintf("%s/request/inter-service/new-message", config.APIBASEURL)
 	method := "POST"
 
 	resp, err := httpRequest(endpointURL, method, token, data)
@@ -116,7 +118,7 @@ func NewMessage(token string, requestID float64, data map[string]interface{}) ([
 }
 
 func DeleteMessage(token string, messageID float64) ([]byte, error) {
-	endpointURL := fmt.Sprintf("http://localhost:8000/request/inter-service/delete-message/%v", messageID)
+	endpointURL := fmt.Sprintf("%s/request/inter-service/delete-message", config.APIBASEURL)
 	method := "POST"
 
 	var data []byte
