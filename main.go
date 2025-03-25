@@ -95,6 +95,8 @@ func main() {
 		log.Fatalf("Error loading public key: %v", err)
 	}
 
+	config.PingBaseAPI()
+
 	http.HandleFunc("/ws", handler)
 	fmt.Println("WebSocket server listening on port", config.ListenPort)
 	addr := fmt.Sprintf(":%s", config.ListenPort)
