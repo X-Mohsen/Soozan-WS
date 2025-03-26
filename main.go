@@ -91,7 +91,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	if err := auth.LoadPublicKey("public_key.pem"); err != nil {
+	if err := auth.LoadPublicKey(config.PublicKeyPath); err != nil {
 		log.Fatalf("Error loading public key: %v", err)
 	}
 
