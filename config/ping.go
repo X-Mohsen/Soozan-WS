@@ -13,7 +13,6 @@ func PingBaseAPI() {
 	}
 
 	resp, err := client.Get(APIBASEURL)
-	fmt.Println(err)
 	if err != nil {
 		log.Fatalf("base API is not reachable")
 	}
